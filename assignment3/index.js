@@ -8,3 +8,8 @@ function hideSidebar(){
   const sidebar = document.querySelector('.sidebar')
    sidebar.style.display = 'none'
 }
+
+const person = {
+
+}
+console.log(person[Symbol.iterator])
