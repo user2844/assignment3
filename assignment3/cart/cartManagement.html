@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            /* Sets a light background for better contrast and readability */
+        }
+
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            /* Simple header styling with a blue background */
+        }
+
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+            justify-content: center;
+            /* Flexbox for a responsive grid layout of products */
+        }
+
+        .product {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            text-align: center;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            /* Product card with shadow and a subtle scale animation on hover */
+        }
+
+        .product:hover {
+            transform: scale(1.02);
+            /* Slight zoom effect on hover for interactivity */
+        }
+
+        .product img {
+            max-width: 100%;
+            height: 200px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            /* Ensures images fit within the card while maintaining aspect ratio */
+        }
+
+        .product button {
+            padding: 8px 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            /* Moved button styling from inline to CSS for consistency */
+        }
+
+        .cart {
+            position: fixed;
+            top: 300px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 1000;
+            /* Fixed cart positioned on the top-right with scrollable content */
+        }
+
+        .cart h3 {
+            margin-top: 0;
+            color: #007BFF;
+            border-bottom: 2px solid #007BFF;
+            padding-bottom: 10px;
+            /* Cart header with a blue underline */
+        }
+
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            /* Table for cart items with collapsed borders for cleaner look */
+        }
+
+        .cart-table th, .cart-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            /* Consistent padding and borders for table cells */
+        }
+
+        .cart-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            /* Header row with a light background */
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #eee;
+            /* Total row with a top border for separation */
+        }
+
+        .cart-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            /* Flexbox for cart action buttons */
+        }
+
+        .cart-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            /* Buttons take equal space with consistent styling */
+        }
+
+        .checkout-btn {
+            background-color: #28a745;
+            color: white;
+            /* Green checkout button */
+        }
+
+        .clear-cart-btn {
+            background-color: #dc3545;
+            color: white;
+            /* Red clear cart button */
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            /* Flexbox for quantity adjustment controls */
+        }
+
+        .quantity-control button {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 2px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            /* Buttons for increment/decrement */
+        }
+
+        .quantity-control input {
+            width: 40px;
+            text-align: center;
+            padding: 2px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            /* Input field for manual quantity entry */
+        }
+
+        .remove-item {
+            color: #dc3545;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 18px;
+            /* Red 'X' button for removing items */
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 0 20px;
+            /* Flexbox for filter controls with wrapping for small screens */
+        }
+
+        .filters select, .filters input, .filters button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            /* Consistent styling for filter inputs */
+        }
+
+        .filters button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            /* Blue apply filters button */
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+            /* Toast notification with fade animation */
+        }
+
+        .toast.show {
+            opacity: 1;
+            /* Visible state for toast */
+        }
+
+        @media (max-width: 768px) {
+            .product {
+                max-width: 45%;
+                /* Two products per row on medium screens */
+            }
+
+            .cart {
+                top: auto;
+                bottom: 0;
+                right: 0;
+                width: 100%;
+                max-width: 100%;
+                max-height: 50vh;
+                border-radius: 15px 15px 0 0;
+                /* Cart moves to bottom on smaller screens */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product {
+                max-width: 100%;
+                /* One product per row on small screens */
+            }
+        }
+    </style>
+
+</head>
+<body>
+    <header>
+        <h1>Enhanced E-Commerce Product Listing</h1>
+    </header>
+
+    <!-- Shopping cart section with ARIA attributes for accessibility -->
+    <div class="cart" role="region" aria-label="Shopping Cart">
+        <h3>Shopping Cart</h3>
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="cartItems"></tbody>
+        </table>
+        <div class="cart-total">
+            <span>Total:</span>
+            <span>$<span id="cartTotal">0</span></span>
+        </div>
+        <div class="cart-actions">
+            <button class="clear-cart-btn" onclick="clearCart()" aria-label="Clear Cart">Clear Cart</button>
+            <button class="checkout-btn" onclick="checkout()" aria-label="Checkout">Checkout</button>
+        </div>
+    </div>
+
+    <!-- Filter controls with ARIA labels for accessibility -->
+    <div class="filters">
+        <input type="text" id="searchBox" placeholder="Search by name" aria-label="Search products">
+        <select id="filterCategory" aria-label="Filter by category">
+            <option value="all">All Categories</option>
+        </select>
+        <select id="sortPrice" aria-label="Sort by price">
+            <option value="">Sort by Price</option>
+            <option value="asc">Low to High</option>
+            <option value="desc">High to Low</option>
+        </select>
+        <input type="number" id="filterRating" placeholder="Min Rating" min="0" max="5" step="0.1" aria-label="Filter by minimum rating">
+        <button onclick="applyFilters()" aria-label="Apply filters">Apply Filters</button>
+    </div>
+
+    <!-- Product list container with role for accessibility -->
+    <div class="product-list" id="productList" role="list"></div>
+
+    <!-- Toast notification with ARIA attributes for screen readers -->
+    <div class="toast" id="toast" role="alert" aria-live="polite">Item added to cart!</div>
+
+
+
+    <script>
+        // Sample product data
+        const products = [
+            { id: 1, name: "Smartphone", image: "https://m.media-amazon.com/images/I/716OmvUFy1L.AC_SL1500.jpg ", price: 599, category: "electronics", rating: 4.5 },
+            { id: 2, name: "Book", image: "https://m.media-amazon.com/images/I/610+0VFgdJL.AC_UF1000,1000_QL80.jpg ", price: 29, category: "books", rating: 4.2 },
+            { id: 3, name: "T-Shirt", image: "https://www.thewalkdeal.com/cdn/shop/products/Alone-NavyBlue.jpg?v=1640675727 ", price: 25, category: "fashion", rating: 4.0 },
+            { id: 4, name: "Headphones", image: "https://aukey.sg/cdn/shop/products/t1-min.jpg?v=1627014090 ", price: 149, category: "electronics", rating: 4.8 },
+            { id: 5, name: "Notebook", image: "https://tiimg.tistatic.com/fp/1/007/478/a4-size-quoted-spiral-notebook-160-pages-used-in-school-843.jpg ", price: 19, category: "stationery", rating: 4.1 },
+        ];
+
+        //Load cart from localStorage or initialize as empty array
+        let cart=JSON.parse(localStorage.getItem('cart'))||[];
+
+        //Render product list to the DOM
+
+
+        const renderProducts=(productList)=>{
+            const productListEl=document.getElementById('productList');
+
+            productListEl.innerHTML=""; //Clear existing content
+            
+            productList.forEach(product=>{
+                const productEl=document.createElement('div');
+                productEl.className="product";
+                productEl.innerHTML=`
+                    <img src="${product.image}" alt="${product.name}">
+                    <h4>${product.name}</h4>
+                    <p>Price:$${product.price}</p>
+                    <p>Category:${product.category}</p>
+                    <p>Rating:${product.rating}/5</p>
+                    <button onclick="addToCart(${product.id})">Add to Cart</button>
+                
+                `;
+                productListEl.appendChild(productEl);
+            });
+        };
+
+        //Render cart items and total to the DOM
+        const renderCart=()=>{
+            const cartItemsEl=document.getElementById('cartItems');
+            const cartTotalEl=document.getElementById('cartTotal');
+            cartItemsEl.innerHTML=""; //clear existing content
+            let total=0;
+
+            cart.forEach((item,index)=>{
+                const itemTotal=item.price*item.quantity;
+                total+=itemTotal;
+                const tr=document.createElement('tr');
+                tr.innerHTML=`
+                    <td>${item.name}
+                    <td>$${item.price}</td>
+                    <td>
+                        <div class="quantity-control">
+                            <button onclick="updateQuantity(${index}, ${item.quantity-1})" aria-label="Decrease Quantity">-</button>
+                            <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${index},this.value)" aria-label="Quantity">
+                            <button onclick="updateQuantity(${index}, ${item.quantity + 1})" aria-label="Increase quantity">+</button>
+                        </div>
+                    </td>
+                    <td>$${itemTotal.toFixed(2)}</td>
+                     <td>
+                        <button class="remove-item" onclick="removeFromCart(${index})" aria-label="Remove ${item.name} from cart">×</button>
+                    </td>
+
+                        
+
+
+                    `;
+                    cartItemsEl.appendChild(tr);
+            });
+            cartTotalEl.textContent=total.toFixed(2);
+            localStorage.setItem('cart',JSON.stringify(cart));
+        };
+
+       // Add a product to the cart
+       const addToCart = (productId) => {
+            const product = products.find(p => p.id === productId);
+            if (!product) return; // Safety check: exit if product not found
+
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity++; // Increment quantity if already in cart
+            } else {
+                cart.push({ ...product, quantity: 1 }); // Add new item with quantity 1
+            }
+            renderCart();
+            showToast("Item added to cart!");
+        };
+
+        // Update quantity of an item in the cart
+        const updateQuantity = (index, newQuantity) => {
+            newQuantity = parseInt(newQuantity);
+            if (isNaN(newQuantity) || newQuantity < 1) newQuantity = 1; // Enforce minimum of 1
+            cart[index].quantity = newQuantity;
+            renderCart();
+        };
+
+        // Remove an item from the cart
+        const removeFromCart = (index) => {
+            cart.splice(index, 1); // Remove item at specified index
+            renderCart();
+            showToast("Item removed from cart");
+        };
+
+        // Clear the entire cart
+        const clearCart = () => {
+            cart = []; // Reset cart to empty array
+            renderCart();
+            showToast("Cart cleared");
+        };
+
+        // Handle checkout process
+        const checkout = () => {
+            if (cart.length === 0) {
+                showToast("Cart is empty!");
+                return;
+            }
+            alert(`Thank you for your purchase!\nTotal: $${document.getElementById('cartTotal').textContent}`);
+            clearCart();
+        };
+
+        // Apply filters and sorting to product list
+        const applyFilters = () => {
+            let filteredProducts = [...products]; // Create a copy to avoid mutating original
+            const searchQuery = document.getElementById('searchBox').value.toLowerCase();
+            const category = document.getElementById('filterCategory').value;
+            const priceSort = document.getElementById('sortPrice').value;
+            const minRating = parseFloat(document.getElementById('filterRating').value) || 0; // Default to 0 if invalid
+
+            if (searchQuery) {
+                filteredProducts = filteredProducts.filter(p => p.name.toLowerCase().includes(searchQuery));
+            }
+
+            if (category !== 'all') {
+                filteredProducts = filteredProducts.filter(p => p.category === category);
+            }
+
+            filteredProducts = filteredProducts.filter(p => p.rating >= minRating);
+
+            if (priceSort === 'asc') {
+                filteredProducts.sort((a, b) => a.price - b.price); // Sort low to high
+            } else if (priceSort === 'desc') {
+                filteredProducts.sort((a, b) => b.price - a.price); // Sort high to low
+            }
+
+            renderProducts(filteredProducts);
+        }; 
+
+        //Populate category filter dropdown
+        const populateCategories=()=>{
+            const categories=[...new Set(products.map(p=>p.category))]; //Get unique categories
+            const filterCategoryEl=document.getElementById('filterCategory');
+            categories.forEach(category=>{
+                const option=document.createElement('option');
+                option.value=category;
+                option.textContent=category.charAt(0).toUpperCase()+category.slice(1);// Capitalize first letter
+                filterCategoryEl.appendChild(option);
+            });
+        };
+
+        //Show toast notification with a message
+        const showToast=(message)=>{
+            const toast=document.getElementById('toast');
+            toast.textContent=message;
+            toast.classList.add('show');
+            setTimeout(()=>toast.classList.remove('show'),3000); //Hide after 3 seconds
+        }
+
+
+        
+
+        window.onload=()=>{ 
+            renderProducts(products);
+            renderCart();
+            populateCategories();
+
+            // Add real-time filter updates
+            document.getElementById('searchBox').addEventListener('input', applyFilters);
+            document.getElementById('filterCategory').addEventListener('change', applyFilters);
+            document.getElementById('sortPrice').addEventListener('change', applyFilters);
+            document.getElementById('filterPrice').addEventListener('input', applyFilters);
+        }
+
+    </script>
+</body>
+</html>
